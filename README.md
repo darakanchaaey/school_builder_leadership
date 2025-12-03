@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เกมสร้างภาวะผู้นำ (Leadership Game) - All in One</title>
+    <title>เกมสร้างภาวะผู้นำ (Leadership Game)</title>
     
     <style>
         body {
@@ -142,6 +142,13 @@
 
         #school-creation {
             text-align: center;
+            padding: 40px 20px;
+            border: 3px solid #4caf50;
+            border-radius: 15px;
+        }
+        
+        #school-creation h2 {
+            color: #4caf50;
         }
 
         #school-name-input {
@@ -171,227 +178,35 @@
             <h2 id="stage-title">Section 1: วิสัยทัศน์และการตัดสินใจ (ภารกิจที่ 1)</h2>
             
             <div id="question-area">
-                <p id="question-text">ผู้นำที่ดีควรใช้หลักการใดในการจัดลำดับความสำคัญของงานที่ต้องทำ?</p>
+                <p id="question-text">Loading...</p>
                 <div id="options-area">
-                    <button class="answer-btn" data-id="1" data-choice="A">A. งานที่ชอบที่สุด</button>
-                    <button class="answer-btn" data-id="1" data-choice="B">B. งานที่เร่งด่วนและสำคัญ</button>
-                    <button class="answer-btn" data-id="1" data-choice="C">C. งานที่ง่ายและเสร็จเร็ว</button>
-                    <button class="answer-btn" data-id="1" data-choice="D">D. งานที่มีคนสั่งมา</button>
                 </div>
             </div>
             
             <div id="reward-area" class="hidden">
                 <h3 id="reward-message">🎉 คำตอบถูกต้อง! ได้รับสิทธิ์เปิดแผ่นป้ายเงินทุน <span id="board-count">0</span> แผ่น</h3>
                 <div id="money-boards">
-                </div>
+                    </div>
                 <button id="next-stage-btn" class="hidden">ไปยังภารกิจถัดไป &gt;</button>
             </div>
 
             <div id="school-creation" class="hidden">
-                <h2>สำเร็จ! คุณสร้างโรงเรียนได้สำเร็จ!</h2>
+                <h2>สำเร็จ! คุณคือผู้นำที่สร้างโรงเรียนแห่งความสำเร็จ!</h2>
                 <div id="school-blueprint">
-                    
+                    <p style="font-size: 2em;">🏫</p>
                     <h3>เงินทุนรวมที่สะสม: <span id="total-money">0</span> บาท</h3>
                     <p>จากการสำรวจภาวะผู้นำของคุณ คุณได้สร้างห้องเรียน/อาคารรวม <span id="room-count">0</span> ห้องเรียน</p>
                     <input type="text" id="school-name-input" placeholder="ตั้งชื่อโรงเรียนของคุณอย่างเป็นทางการ">
                     <button id="finish-game-btn">ดูผลวิเคราะห์ภาวะผู้นำ</button>
-                </div>
+                    </div>
             </div>
         </section>
     </main>
 
     <script>
-        // --- 1. ข้อมูลเกมและคำถามทั้งหมด ---
+        // --- 1. ข้อมูลเกมและคำถามทั้งหมด (ขยายให้ครบ 4 Section x 5 ภารกิจ) ---
         const GAME_DATA = [
+            // Section 1: 5 Questions
             {
                 section: 1,
-                title: "วิสัยทัศน์และการตัดสินใจ",
-                questions: [
-                    {
-                        id: 1,
-                        text: "ผู้นำที่ดีควรใช้หลักการใดในการจัดลำดับความสำคัญของงานที่ต้องทำ?",
-                        options: {
-                            A: "งานที่ชอบที่สุด",
-                            B: "งานที่เร่งด่วนและสำคัญ", // คำตอบถูก
-                            C: "งานที่ง่ายและเสร็จเร็ว",
-                            D: "งานที่มีคนสั่งมา"
-                        },
-                        answer: "B",
-                        points: 100
-                    },
-                ]
-            }
-        ];
-
-        // --- 2. ตัวแปรสถานะของเกม (Game State) ---
-        let gameState = {
-            currentSection: 1,
-            currentMission: 1, // 1-5
-            totalMoney: 0,
-            moneyBoardsOpened: 0,
-            boardsAllowed: 0,
-            isQuestionAnswered: false,
-        };
-
-        // --- 3. ฟังก์ชันอัปเดต UI สถานะเกม ---
-        function updateStatusUI() {
-            document.getElementById('current-money').textContent = gameState.totalMoney.toLocaleString('th-TH');
-            document.getElementById('current-section').textContent = gameState.currentSection;
-            document.getElementById('current-mission').textContent = gameState.currentMission;
-        }
-
-        // --- 4. ฟังก์ชันจัดการเมื่อตอบคำถาม ---
-        function handleAnswer(questionId, selectedChoice) {
-            if (gameState.isQuestionAnswered) return;
-            
-            const currentSectionData = GAME_DATA.find(s => s.section === gameState.currentSection);
-            const question = currentSectionData.questions.find(q => q.id === questionId);
-
-            if (!question) return;
-
-            gameState.isQuestionAnswered = true;
-            
-            // ไฮไลต์ปุ่มที่เลือกและปิดการใช้งานปุ่มอื่น
-            document.querySelectorAll('.answer-btn').forEach(btn => {
-                btn.disabled = true;
-                if (btn.dataset.choice === selectedChoice) {
-                    btn.style.backgroundColor = (selectedChoice === question.answer) ? '#28a745' : '#dc3545';
-                }
-            });
-
-            // ตรวจสอบคะแนน
-            let score = (selectedChoice === question.answer) ? 100 : 50;
-            
-            // กำหนดจำนวนแผ่นป้ายที่เปิดได้
-            let boardsToOpen = 0;
-            if (score === 100) {
-                boardsToOpen = 3;
-            } else if (score >= 50) {
-                boardsToOpen = 2;
-            } else {
-                boardsToOpen = 1;
-            }
-            gameState.boardsAllowed = boardsToOpen;
-            gameState.moneyBoardsOpened = 0;
-
-            // แสดงส่วนเปิดแผ่นป้าย
-            document.getElementById('question-area').classList.add('hidden');
-            document.getElementById('reward-message').innerHTML = `🎉 คำตอบถูกต้อง! ได้รับสิทธิ์เปิดแผ่นป้ายเงินทุน <span id="board-count">${boardsToOpen}</span> แผ่น`;
-            document.getElementById('reward-area').classList.remove('hidden');
-            
-            // สร้างแผ่นป้าย
-            createMoneyBoards(boardsToOpen);
-        }
-
-        // --- 5. ฟังก์ชันสร้างแผ่นป้ายเงินรางวัล ---
-        function createMoneyBoards(count) {
-            const boardArea = document.getElementById('money-boards');
-            boardArea.innerHTML = '';
-            
-            for (let i = 0; i < 3; i++) {
-                const reward = (i + 1) * 5000 + Math.floor(Math.random() * 10) * 100;
-                const button = document.createElement('button');
-                button.className = 'board-card';
-                button.dataset.reward = reward;
-                button.textContent = '?';
-                button.addEventListener('click', openBoard);
-                boardArea.appendChild(button);
-            }
-        }
-
-        // --- 6. ฟังก์ชันจัดการการเปิดแผ่นป้าย ---
-        function openBoard(event) {
-            const boardElement = event.target;
-            if (gameState.moneyBoardsOpened >= gameState.boardsAllowed || boardElement.classList.contains('revealed')) {
-                // ให้แสดงข้อความเตือนเล็กน้อยถ้าคลิกเกินสิทธิ์
-                if (gameState.moneyBoardsOpened >= gameState.boardsAllowed) {
-                    alert('คุณเปิดแผ่นป้ายครบตามสิทธิ์แล้ว!');
-                }
-                return;
-            }
-            
-            const reward = parseInt(boardElement.dataset.reward);
-            
-            // อัปเดตสถานะ
-            gameState.totalMoney += reward;
-            gameState.moneyBoardsOpened++;
-            updateStatusUI();
-            
-            // อัปเดต UI แผ่นป้าย
-            boardElement.textContent = `${reward.toLocaleString('th-TH')}฿`;
-            boardElement.classList.add('revealed');
-            boardElement.removeEventListener('click', openBoard);
-            
-            // ตรวจสอบว่าเปิดครบตามสิทธิ์แล้วหรือยัง
-            if (gameState.moneyBoardsOpened >= gameState.boardsAllowed) {
-                document.getElementById('next-stage-btn').classList.remove('hidden');
-            }
-        }
-
-        // --- 7. ฟังก์ชันเปลี่ยนไปยังภารกิจ/ด่านถัดไป ---
-        function nextStage() {
-            // รีเซ็ตสถานะและ UI
-            document.getElementById('reward-area').classList.add('hidden');
-            document.getElementById('next-stage-btn').classList.add('hidden');
-            document.getElementById('question-area').classList.remove('hidden');
-            gameState.isQuestionAnswered = false;
-            
-            gameState.currentMission++;
-            
-            if (gameState.currentMission > 5) {
-                gameState.currentSection++;
-                gameState.currentMission = 1;
-                
-                if (gameState.currentSection > 4) {
-                    showSchoolCreation();
-                    return;
-                }
-            }
-            
-            loadMission(gameState.currentMission);
-            updateStatusUI();
-        }
-
-        // --- 8. ฟังก์ชันโหลดภารกิจ/คำถาม ---
-        function loadMission(missionNumber) {
-            const currentSectionData = GAME_DATA.find(s => s.section === gameState.currentSection);
-            // เนื่องจากมีคำถามเดียว จึงใช้ Index 0 ซ้ำเพื่อสาธิต
-            const question = currentSectionData.questions[0]; 
-
-            document.getElementById('stage-title').textContent = `${currentSectionData.title} (ภารกิจที่ ${missionNumber})`;
-            document.getElementById('question-text').textContent = question.text;
-            
-            const optionsArea = document.getElementById('options-area');
-            optionsArea.innerHTML = '';
-            
-            for (const [key, value] of Object.entries(question.options)) {
-                const button = document.createElement('button');
-                button.className = 'answer-btn';
-                button.dataset.id = question.id;
-                button.dataset.choice = key;
-                button.textContent = `${key}. ${value}`;
-                button.addEventListener('click', (e) => handleAnswer(parseInt(e.target.dataset.id), e.target.dataset.choice));
-                optionsArea.appendChild(button);
-            }
-        }
-
-        // --- 9. ฟังก์ชันแสดงหน้าสร้างโรงเรียน (หลังจบเกม) ---
-        function showSchoolCreation() {
-            document.getElementById('game-stage').classList.add('hidden');
-            document.getElementById('school-creation').classList.remove('hidden');
-            
-            const rooms = Math.floor(gameState.totalMoney / 50000);
-            document.getElementById('total-money').textContent = gameState.totalMoney.toLocaleString('th-TH');
-            document.getElementById('room-count').textContent = rooms;
-        }
-
-        // --- 10. การเริ่มต้นเกม ---
-        document.addEventListener('DOMContentLoaded', () => {
-            updateStatusUI();
-            loadMission(gameState.currentMission);
-            
-            document.getElementById('next-stage-btn').addEventListener('click', nextStage);
-        });
-    </script>
-</body>
-</html>
+                title: "วิสัย
